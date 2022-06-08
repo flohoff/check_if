@@ -1,0 +1,10 @@
+*.bin
+.*
+!.gitignore
+CMakeCache.txt
+CMakeFiles
+IfState.pb.cc
+IfState.pb.h
+Makefile
+checkif
+cmake_install.cmake

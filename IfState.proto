@@ -1,0 +1,63 @@
+message EntityTransceiver {
+	optional uint32	powertx = 1 [ default = 0 ];
+	optional uint32 powerrx = 2 [ default = 0 ];
+	optional uint32 current = 3 [ default = 0 ];
+	optional uint32 temp = 4 [ default = 0 ];
+	optional uint32 voltage = 5 [ default = 0 ];
+}
+
+message IfCapabilities {
+	optional uint32	instance = 1 [default = 0];
+	optional bool cap_errors = 2 [default = false];
+	optional bool cap_lc_counter = 3 [default = false];
+	optional bool cap_hc_counter = 4 [default = false];
+	optional bool cap_hc_mcast = 5 [default = false];
+	optional bool cap_ipv6_status = 6 [default = false];
+	required uint64 lastchecked = 7;
+	optional EntityTransceiver transceiver = 8;
+	optional bool cap_cisco_errdisable = 9 [default = false];
+	optional bool cap_dot3Stats = 10 [default = false];
+}
+
+message IfState {
+	required IfCapabilities ifCapabilities = 1;
+
+	optional uint64 time = 2;
+
+	optional string	ifName = 3;
+	optional string	ifAlias = 4;
+	optional string	ifDescr = 5;
+	optional uint32	ifAdminStatus = 6;
+	optional uint32	ifOperStatus = 7;
+
+	optional uint32	ipv6IfOperStatus = 8;
+	optional uint32	ipv6IfAdminStatus = 9;
+
+	/* LC Counter */
+	optional uint32	ifInOctets = 10;
+	optional uint32	ifOutOctets = 11;
+	optional uint32	ifInUcastPkts = 12;
+	optional uint32	ifInNUcastPkts = 13;
+	optional uint32	ifOutUcastPkts = 14;
+	optional uint32	ifOutNUcastPkts = 15;
+
+	/* Errors */
+	optional uint32	ifInDiscards = 16;
+	optional uint32	ifInErrors = 17;
+	optional uint32	ifOutDiscards = 18;
+	optional uint32	ifOutErrors = 19;
+	optional uint32	ifInUnknownProtos = 20;
+
+	/* HC Counter */
+	optional uint64	ifHCInOctets = 21;
+	optional uint64	ifHCInUcastPkts = 22;
+	optional uint64	ifHCInMulticastPkts = 23;
+	optional uint64	ifHCInBroadcastPkts = 24;
+	optional uint64	ifHCOutOctets = 25;
+	optional uint64	ifHCOutUcastPkts = 26;
+	optional uint64	ifHCOutMulticastPkts = 27;
+	optional uint64	ifHCOutBroadcastPkts = 28;
+
+	optional uint32	cisco_errdisableifstatuscause = 29;
+	optional uint32	dot3StatsDuplexStatus = 30;
+}

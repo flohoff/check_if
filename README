@@ -1,0 +1,18 @@
+
+To build this plugin you need
+
+* c++11 compiler e.g. Debian/Jessie gcc
+* cmake
+* protobuf-compiler
+* libprotobuf-dev
+* libboost-filesystem-dev
+* libboost-program-options-dev
+* libboost-system-dev
+* libboost-dev
+* snmp++ from http://www.agentpp.com/api/cpp/snmp_pp.html
+
+
+apt-get install build-essential cmake protobuf-compiler libprotobuf-dev \
+	libboost-dev libboost-program-options-dev libboost-system-dev \
+	libboost-filesystem-dev libssl-dev
+
