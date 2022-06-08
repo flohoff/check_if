@@ -1,22 +1,23 @@
-message EntityTransceiver {
-	optional uint32	powertx = 1 [ default = 0 ];
-	optional uint32 powerrx = 2 [ default = 0 ];
-	optional uint32 current = 3 [ default = 0 ];
-	optional uint32 temp = 4 [ default = 0 ];
-	optional uint32 voltage = 5 [ default = 0 ];
+message Transceiver {
+	optional int32 powertx = 1 [ default = 0 ];
+	optional int32 powerrx = 2 [ default = 0 ];
+	optional int32 current = 3 [ default = 0 ];
+	optional int32 temp = 4 [ default = 0 ];
+	optional int32 voltage = 5 [ default = 0 ];
 }
 
 message IfCapabilities {
-	optional uint32	instance = 1 [default = 0];
-	optional bool cap_errors = 2 [default = false];
-	optional bool cap_lc_counter = 3 [default = false];
-	optional bool cap_hc_counter = 4 [default = false];
-	optional bool cap_hc_mcast = 5 [default = false];
-	optional bool cap_ipv6_status = 6 [default = false];
-	required uint64 lastchecked = 7;
-	optional EntityTransceiver transceiver = 8;
-	optional bool cap_cisco_errdisable = 9 [default = false];
-	optional bool cap_dot3Stats = 10 [default = false];
+	required uint64 lastchecked = 1;
+	optional uint32	instance = 2 [default = 0];
+	optional bool cap_errors = 3 [default = false];
+	optional bool cap_lc_counter = 4 [default = false];
+	optional bool cap_hc_counter = 5 [default = false];
+	optional bool cap_hc_mcast = 6 [default = false];
+	optional bool cap_ipv6_status = 7 [default = false];
+	optional bool cap_cisco_errdisable = 8 [default = false];
+	optional bool cap_dot3Stats = 9 [default = false];
+	optional bool cap_entity_transceiver = 10 [default = false];
+	optional bool cap_hpicf_transceiver = 11 [default = false];
 }
 
 message IfState {
@@ -60,4 +61,6 @@ message IfState {
 
 	optional uint32	cisco_errdisableifstatuscause = 29;
 	optional uint32	dot3StatsDuplexStatus = 30;
+
+	optional Transceiver transceiver = 31;
 }

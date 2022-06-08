@@ -635,7 +635,7 @@ class CheckIf {
 			return true;
 		}
 
-		EntityTransceiver *transceiver_check(void ) {
+		Transceiver *entity_transceiver_check(void ) {
 			unsigned int			instance;
 			std::string			oid;
 			std::vector<Entity>		entitys;
@@ -643,7 +643,7 @@ class CheckIf {
 			if (!findinstance_in("entPhysicalName", &instance))
 				return nullptr;
 
-			EntityTransceiver	*transceiver=new EntityTransceiver;
+			Transceiver	*transceiver=new Transceiver;
 
 			Entity	e(snmp, instance);
 			entitys.push_back(e);
@@ -697,11 +697,11 @@ class CheckIf {
 			return nullptr;
 		}
 
-		void transceiver_read(void ) {
-			if (!ifcap->has_transceiver())
+		void entity_transceiver_read(void ) {
+			if (!ifcap->cap_entity_transceiver())
 				return;
 
-			EntityTransceiver	*transceiver=ifcap->mutable_transceiver();
+			Transceiver	*transceiver=ifs->mutable_transceiver();
 
 			EntitySensor	powertx(snmp, transceiver->powertx());
 			EntitySensor	powerrx(snmp, transceiver->powerrx());
@@ -743,10 +743,12 @@ class CheckIf {
 			ifcap->set_cap_hc_mcast(has_snmp_variable("ifHCInMulticastPkts", instance));
 			ifcap->set_cap_cisco_errdisable(has_snmp_variable("cErrDisableRecoveryInterval", 0));
 			ifcap->set_cap_dot3stats(has_snmp_variable("dot3StatsDuplexStatus", instance));
+			ifcap->set_cap_hpicf_transceiver(has_snmp_variable("hpicfXcvrRxPower", instance));
 
-			EntityTransceiver *tr=transceiver_check();
+			/* FIXME Leaks tranceiver object */
+			Transceiver *tr=entity_transceiver_check();
 			if (tr)
-				ifcap->set_allocated_transceiver(tr);
+				ifcap->set_cap_entity_transceiver(true);
 
 			return ifcap;
 		}
@@ -786,6 +788,7 @@ class CheckIf {
 
 		bool if_read_snmp(void ) {
 			std::vector<std::string>	oidstrings;
+			Transceiver			*transceiver=nullptr;
 
 			if (!ifcap->has_instance() || ifcap->instance() == 0)
 				return false;
@@ -827,6 +830,15 @@ class CheckIf {
 				oidstrings.push_back("ifInNUcastPkts");
 				oidstrings.push_back("ifOutUcastPkts");
 				oidstrings.push_back("ifOutNUcastPkts");
+			}
+
+			if (ifcap->cap_hpicf_transceiver()) {
+				oidstrings.push_back("hpicfXcvrRxPower");
+				oidstrings.push_back("hpicfXcvrTxPower");
+				oidstrings.push_back("hpicfXcvrTemp");
+				oidstrings.push_back("hpicfXcvrVoltage");
+
+				transceiver=ifs->mutable_transceiver();
 			}
 
 			if (ifcap->cap_dot3stats()) {
@@ -902,6 +914,12 @@ class CheckIf {
 				if (r.sminame("cErrDisableIfStatusCause")) { ifs->set_cisco_errdisableifstatuscause(r.smivalue_int()); continue; }
 
 				if (r.sminame("dot3StatsDuplexStatus")) { ifs->set_dot3statsduplexstatus(r.smivalue_int()); continue; }
+
+				if (r.sminame("hpicfXcvrRxPower")) { transceiver->set_powerrx(r.smivalue_int()); continue; }
+				if (r.sminame("hpicfXcvrTxPower")) { transceiver->set_powertx(r.smivalue_int()); continue; }
+				if (r.sminame("hpicfXcvrTemp")) { transceiver->set_temp(r.smivalue_int()); continue; }
+				if (r.sminame("hpicfXcvrVoltage")) { transceiver->set_voltage(r.smivalue_uint32()); continue; }
+
 			}
 
 			return true;
@@ -1022,6 +1040,7 @@ class CheckIf {
 
 			syslog(LOG_INFO, "%s", msg.str().c_str());
 
+			return result;
 		}
 
 		uint64_t octets_delta_in(void ) {
@@ -1071,6 +1090,7 @@ class CheckIf {
 			if (strcmp(fvalue, "ifOutErrors") == 0) {
 				return ifs->ifouterrors()-ifsl->ifouterrors();
 			}
+			return 0;
 		}
 
 		/*
@@ -1264,6 +1284,13 @@ class CheckIf {
 			np->addperfdata(PerfData("ifinerrors", 2, ((double) delta_fault("ifInErrors"))/time_delta()));
 			np->addperfdata(PerfData("ifouterrors", 2, ((double) delta_fault("ifOutErrors"))/time_delta()));
 
+			if (ifcap->cap_hpicf_transceiver()) {
+				np->addperfdata(PerfData("transceiver_tx_dbm", 2, ((double) ifs->transceiver().powertx())/1000 ));
+				np->addperfdata(PerfData("transceiver_rx_dbm", 2, ((double) ifs->transceiver().powerrx())/1000 ));
+				np->addperfdata(PerfData("transceiver_temp", 2, ((double) ifs->transceiver().temp())/1000 ));
+				np->addperfdata(PerfData("transceiver_voltage", 2, ((double) ifs->transceiver().voltage())/1000 ));
+			}
+
 			delta_ok_string();
 		}
 
@@ -1307,7 +1334,7 @@ class CheckIf {
 			}
 
 			if_check_state();
-			transceiver_read();
+			entity_transceiver_read();
 			state_write();
 		}
 };
@@ -1389,6 +1416,16 @@ int main(int argc, char **argv) {
 
 	smi.addsmimap("cErrDisableRecoveryInterval", "1.3.6.1.4.1.9.9.548.1.1.1");
 	smi.addsmimap("cErrDisableIfStatusCause", "1.3.6.1.4.1.9.9.548.1.3.1.1.2");
+
+	smi.addsmimap("hpicfXcvrRxPower", "1.3.6.1.4.1.11.2.14.11.5.1.82.1.1.1.1.15");
+	smi.addsmimap("hpicfXcvrTxPower", "1.3.6.1.4.1.11.2.14.11.5.1.82.1.1.1.1.14");
+	smi.addsmimap("hpicfXcvrTemp", "1.3.6.1.4.1.11.2.14.11.5.1.82.1.1.1.1.11");
+	smi.addsmimap("hpicfXcvrVoltage", "1.3.6.1.4.1.11.2.14.11.5.1.82.1.1.1.1.12");
+
+	// HP-ICF-TRANSCEIVER-MIB::hpicfXcvrRcvPwrLoWarn.1
+	// HP-ICF-TRANSCEIVER-MIB::hpicfXcvrRcvPwrHiWarn.103
+	// HP-ICF-TRANSCEIVER-MIB::hpicfXcvrRcvPwrLoAlarm.14
+	// HP-ICF-TRANSCEIVER-MIB::hpicfXcvrRcvPwrHiAlarm.99
 
 	std::srand(std::time(0)^getpid());
 	Snmp::socket_startup();
