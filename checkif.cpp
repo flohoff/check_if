@@ -1284,14 +1284,21 @@ class CheckIf {
 			np->addperfdata(PerfData("ifinerrors", 2, ((double) delta_fault("ifInErrors"))/time_delta()));
 			np->addperfdata(PerfData("ifouterrors", 2, ((double) delta_fault("ifOutErrors"))/time_delta()));
 
+			delta_ok_string();
+
 			if (ifcap->cap_hpicf_transceiver()) {
+				std::ostringstream	msg;
+
 				np->addperfdata(PerfData("transceiver_tx_dbm", 2, ((double) ifs->transceiver().powertx())/1000 ));
 				np->addperfdata(PerfData("transceiver_rx_dbm", 2, ((double) ifs->transceiver().powerrx())/1000 ));
 				np->addperfdata(PerfData("transceiver_temp", 2, ((double) ifs->transceiver().temp())/1000 ));
 				np->addperfdata(PerfData("transceiver_voltage", 2, ((double) ifs->transceiver().voltage())/10000 ));
-			}
 
-			delta_ok_string();
+				msg << "Transceiver tx " << (double) ifs->transceiver().powertx()/1000 << "dBm " <<
+					"rx " << (double) ifs->transceiver().powerrx()/1000 << "dBm ";
+
+				np->addmsg(NS_OK, msg.str());
+			}
 		}
 
 		CheckIf(po::variables_map &vm, SNMP *snmp, NagiosPlugin *np) :
