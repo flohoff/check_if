@@ -23,6 +23,7 @@
 #include <syslog.h>
 
 #include "IfState.pb.h"
+#include "Nagios.hpp"
 
 namespace po = boost::program_options;
 namespace bfs = boost::filesystem;
@@ -37,82 +38,6 @@ using namespace Snmp_pp;
 #define DATA_STALE		600
 
 typedef std::vector<std::pair<std::string,std::string>>	SNMPresult;
-
-enum NagiosState {
-	NS_OK = 0,
-	NS_UNKNOWN = 1,
-	NS_WARNING = 2,
-	NS_CRITICAL = 3,
-};
-
-class PerfData {
-	private:
-			std::string	name;
-			double		value;
-			int		precision;
-	public:
-
-	PerfData(std::string name, int precision, double value) : name(name), precision(precision), value(value) {};
-
-	friend std::ostream & operator<<(std::ostream &os, PerfData pd) {
-		os << pd.name << "=" << std::fixed << std::setprecision(pd.precision) << pd.value;
-		return os;
-	}
-};
-
-class NagiosPlugin {
-	private:
-
-	std::vector<std::pair<NagiosState, std::string>>	msglist;
-	std::vector<std::string>	statestring={ "OK", "UNKNOWN", "WARNING", "CRITICAL" };
-	std::vector<int>		stateexit={ 0, 3, 1, 2 };
-	std::vector<PerfData>		perfdatalist;
-
-	public:
-
-	void addmsg(NagiosState ns, std::string message) {
-		msglist.push_back(std::make_pair(ns, message));
-	}
-
-	void addperfdata(PerfData pd) {
-		perfdatalist.push_back(pd);
-	}
-
-	int exit(void ) {
-		NagiosState	higheststate=NS_OK;
-
-		for(auto &msg : msglist) {
-			if (msg.first == NS_UNKNOWN) {
-				std::cout << "IF " << statestring[NS_UNKNOWN] << " - " << msg.second << std::endl;
-				return stateexit[NS_UNKNOWN];
-			}
-		}
-
-		for(auto &msg : msglist) {
-			if (msg.first > higheststate)
-				higheststate=msg.first;
-		}
-
-		std::cout << "IF " << statestring[higheststate] << " - ";
-
-		for(auto &msg : msglist) {
-			if (msg.first == higheststate)
-				std::cout << msg.second << " ";
-		}
-
-		if (!perfdatalist.empty()) {
-			std::cout << " | ";
-			for(auto &pd : perfdatalist) {
-				std::cout << pd << " ";
-			}
-		}
-
-		std::cout << std::endl;
-
-		return stateexit[higheststate];
-	}
-};
-
 class SMI {
 private:
 	std::unordered_map<std::string,std::string>	name2oidmap;
@@ -714,13 +639,13 @@ class CheckIf {
 			np->addmsg(NS_OK, msg.str());
 
 			if (powertx.valid())
-				np->addperfdata(PerfData("transceiver_tx_dbm", 2, (double) powertx.dBm()));
+				np->addperfdata(NagiosPerfData("transceiver_tx_dbm", 2, (double) powertx.dBm()));
 			if (powerrx.valid())
-				np->addperfdata(PerfData("transceiver_rx_dbm", 2, (double) powerrx.dBm()));
+				np->addperfdata(NagiosPerfData("transceiver_rx_dbm", 2, (double) powerrx.dBm()));
 			if (temp.valid())
-				np->addperfdata(PerfData("transceiver_temp", 2, (double) temp.value()));
+				np->addperfdata(NagiosPerfData("transceiver_temp", 2, (double) temp.value()));
 			if (current.valid())
-				np->addperfdata(PerfData("transceiver_current", 2, (double) current.value()));
+				np->addperfdata(NagiosPerfData("transceiver_current", 2, (double) current.value()));
 		}
 
 		IfCapabilities *if_capabilities_read(void ) {
@@ -1209,11 +1134,11 @@ class CheckIf {
 
 			np->addmsg(NS_OK, msg.str());
 
-			np->addperfdata(PerfData("pktsin", 1, ppsin));
-			np->addperfdata(PerfData("pktsout", 1, ppsout));
+			np->addperfdata(NagiosPerfData("pktsin", 1, ppsin));
+			np->addperfdata(NagiosPerfData("pktsout", 1, ppsout));
 
-			np->addperfdata(PerfData("octetsin", 1, ((double) octets_delta_in())/delta_t));
-			np->addperfdata(PerfData("octetsout", 1, ((double) octets_delta_out())/delta_t));
+			np->addperfdata(NagiosPerfData("octetsin", 1, ((double) octets_delta_in())/delta_t));
+			np->addperfdata(NagiosPerfData("octetsout", 1, ((double) octets_delta_out())/delta_t));
 		}
 
 
@@ -1223,8 +1148,8 @@ class CheckIf {
 				np->addmsg(NS_WARNING, "Interface is Administrative down");
 				return;
 			}
-			np->addperfdata(PerfData("adminstatus", 0, (double) ifs->ifadminstatus()));
-			np->addperfdata(PerfData("operstatus", 0, (double) ifs->ifoperstatus()));
+			np->addperfdata(NagiosPerfData("adminstatus", 0, (double) ifs->ifadminstatus()));
+			np->addperfdata(NagiosPerfData("operstatus", 0, (double) ifs->ifoperstatus()));
 
 			if (ifs->has_cisco_errdisableifstatuscause()
 					&& ifs->cisco_errdisableifstatuscause()) {
@@ -1279,20 +1204,20 @@ class CheckIf {
 			delta_alarm("ifInErrors", vm["ifinerrorsignore"].as<std::string>(), pkt_delta_in());
 			delta_alarm("ifOutErrors", vm["ifouterrorsignore"].as<std::string>(), pkt_delta_out());
 
-			np->addperfdata(PerfData("ifindiscards", 2, ((double) delta_fault("ifInDiscards"))/time_delta()));
-			np->addperfdata(PerfData("ifoutdiscards", 2, ((double) delta_fault("ifOutDiscards"))/time_delta()));
-			np->addperfdata(PerfData("ifinerrors", 2, ((double) delta_fault("ifInErrors"))/time_delta()));
-			np->addperfdata(PerfData("ifouterrors", 2, ((double) delta_fault("ifOutErrors"))/time_delta()));
+			np->addperfdata(NagiosPerfData("ifindiscards", 2, ((double) delta_fault("ifInDiscards"))/time_delta()));
+			np->addperfdata(NagiosPerfData("ifoutdiscards", 2, ((double) delta_fault("ifOutDiscards"))/time_delta()));
+			np->addperfdata(NagiosPerfData("ifinerrors", 2, ((double) delta_fault("ifInErrors"))/time_delta()));
+			np->addperfdata(NagiosPerfData("ifouterrors", 2, ((double) delta_fault("ifOutErrors"))/time_delta()));
 
 			delta_ok_string();
 
 			if (ifcap->cap_hpicf_transceiver()) {
 				std::ostringstream	msg;
 
-				np->addperfdata(PerfData("transceiver_tx_dbm", 2, ((double) ifs->transceiver().powertx())/1000 ));
-				np->addperfdata(PerfData("transceiver_rx_dbm", 2, ((double) ifs->transceiver().powerrx())/1000 ));
-				np->addperfdata(PerfData("transceiver_temp", 2, ((double) ifs->transceiver().temp())/1000 ));
-				np->addperfdata(PerfData("transceiver_voltage", 2, ((double) ifs->transceiver().voltage())/10000 ));
+				np->addperfdata(NagiosPerfData("transceiver_tx_dbm", 2, ((double) ifs->transceiver().powertx())/1000 ));
+				np->addperfdata(NagiosPerfData("transceiver_rx_dbm", 2, ((double) ifs->transceiver().powerrx())/1000 ));
+				np->addperfdata(NagiosPerfData("transceiver_temp", 2, ((double) ifs->transceiver().temp())/1000 ));
+				np->addperfdata(NagiosPerfData("transceiver_voltage", 2, ((double) ifs->transceiver().voltage())/10000 ));
 
 				msg << "Transceiver tx " << (double) ifs->transceiver().powertx()/1000 << "dBm " <<
 					"rx " << (double) ifs->transceiver().powerrx()/1000 << "dBm ";
