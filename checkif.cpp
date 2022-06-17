@@ -235,14 +235,22 @@ public:
 		target.set_readcommunity(communitystring.c_str());
 	}
 
-	std::string snmpget(std::string &oidstring) {
+	SNMPResultList *snmpget(std::string &oidstring) {
 		std::vector<std::string>	list;
 		SNMPResultList			*resultlist;
-		std::string			result;
 
 		list.push_back(oidstring);
 
 		resultlist=snmpget(list);
+
+		return resultlist;
+	}
+
+	std::string snmpget_printable(std::string &oidstring) {
+		SNMPResultList			*resultlist;
+		std::string			result;
+
+		resultlist=snmpget(oidstring);
 
 		if (resultlist->size() > 0)
 			result=resultlist->begin().printable_value();
@@ -552,7 +560,7 @@ class CheckIf {
 			oidstring.append(".");
 			oidstring.append(std::to_string(instance));
 
-			value=snmp->snmpget(oidstring);
+			value=snmp->snmpget_printable(oidstring);
 
 			if (value.size() == 0)
 				return false;
@@ -668,6 +676,8 @@ class CheckIf {
 			ifcap->set_cap_hc_mcast(has_snmp_variable("ifHCInMulticastPkts", instance));
 			ifcap->set_cap_cisco_errdisable(has_snmp_variable("cErrDisableRecoveryInterval", 0));
 			ifcap->set_cap_dot3stats(has_snmp_variable("dot3StatsDuplexStatus", instance));
+
+			// Need to check whether Transceiver has DOM capabilities
 			ifcap->set_cap_hpicf_transceiver(has_snmp_variable("hpicfXcvrRxPower", instance));
 
 			/* FIXME Leaks tranceiver object */
@@ -1362,12 +1372,6 @@ int main(int argc, char **argv) {
 	smi.addsmimap("hpicfXcvrAlarms", "1.3.6.1.4.1.11.2.14.11.5.1.82.1.1.1.1.16");
 	smi.addsmimap("hpicfXcvrErrors", "1.3.6.1.4.1.11.2.14.11.5.1.82.1.1.1.1.17");
 	smi.addsmimap("hpicfXcvrDiagnostics", "1.3.6.1.4.1.11.2.14.11.5.1.82.1.1.1.1.9");
-
-
-	// HP-ICF-TRANSCEIVER-MIB::hpicfXcvrRcvPwrLoWarn.1
-	// HP-ICF-TRANSCEIVER-MIB::hpicfXcvrRcvPwrHiWarn.103
-	// HP-ICF-TRANSCEIVER-MIB::hpicfXcvrRcvPwrLoAlarm.14
-	// HP-ICF-TRANSCEIVER-MIB::hpicfXcvrRcvPwrHiAlarm.99
 
 	std::srand(std::time(0)^getpid());
 	Snmp::socket_startup();
