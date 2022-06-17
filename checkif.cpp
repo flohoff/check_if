@@ -1359,8 +1359,10 @@ int main(int argc, char **argv) {
 	smi.addsmimap("hpicfXcvrTxPower", "1.3.6.1.4.1.11.2.14.11.5.1.82.1.1.1.1.14");
 	smi.addsmimap("hpicfXcvrTemp", "1.3.6.1.4.1.11.2.14.11.5.1.82.1.1.1.1.11");
 	smi.addsmimap("hpicfXcvrVoltage", "1.3.6.1.4.1.11.2.14.11.5.1.82.1.1.1.1.12");
-	smi.addsmimap("hpicfXcvrAlarms", ".1.3.6.1.4.1.11.2.14.11.5.1.82.1.1.1.1.16");
-	smi.addsmimap("hpicfXcvrErrors", ".1.3.6.1.4.1.11.2.14.11.5.1.82.1.1.1.1.17");
+	smi.addsmimap("hpicfXcvrAlarms", "1.3.6.1.4.1.11.2.14.11.5.1.82.1.1.1.1.16");
+	smi.addsmimap("hpicfXcvrErrors", "1.3.6.1.4.1.11.2.14.11.5.1.82.1.1.1.1.17");
+	smi.addsmimap("hpicfXcvrDiagnostics", "1.3.6.1.4.1.11.2.14.11.5.1.82.1.1.1.1.9");
+
 
 	// HP-ICF-TRANSCEIVER-MIB::hpicfXcvrRcvPwrLoWarn.1
 	// HP-ICF-TRANSCEIVER-MIB::hpicfXcvrRcvPwrHiWarn.103
