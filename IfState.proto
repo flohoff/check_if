@@ -4,6 +4,8 @@ message Transceiver {
 	optional int32 current = 3 [ default = 0 ];
 	optional int32 temp = 4 [ default = 0 ];
 	optional int32 voltage = 5 [ default = 0 ];
+	optional int32 errors = 6 [ default = 0 ];
+	optional int32 alarms = 7 [ default = 0 ];
 }
 
 message IfCapabilities {

@@ -762,6 +762,8 @@ class CheckIf {
 				oidstrings.push_back("hpicfXcvrTxPower");
 				oidstrings.push_back("hpicfXcvrTemp");
 				oidstrings.push_back("hpicfXcvrVoltage");
+				oidstrings.push_back("hpicfXcvrAlarms");
+				oidstrings.push_back("hpicfXcvrErrors");
 
 				transceiver=ifs->mutable_transceiver();
 			}
@@ -844,6 +846,8 @@ class CheckIf {
 				if (r.sminame("hpicfXcvrTxPower")) { transceiver->set_powertx(r.smivalue_int()); continue; }
 				if (r.sminame("hpicfXcvrTemp")) { transceiver->set_temp(r.smivalue_int()); continue; }
 				if (r.sminame("hpicfXcvrVoltage")) { transceiver->set_voltage(r.smivalue_uint32()); continue; }
+				if (r.sminame("hpicfXcvrErrors")) { transceiver->set_errors(r.smivalue_uint32()); continue; }
+				if (r.sminame("hpicfXcvrAlarms")) { transceiver->set_alarms(r.smivalue_uint32()); continue; }
 
 			}
 
@@ -1222,6 +1226,8 @@ class CheckIf {
 				msg << "Transceiver tx " << (double) ifs->transceiver().powertx()/1000 << "dBm " <<
 					"rx " << (double) ifs->transceiver().powerrx()/1000 << "dBm ";
 
+				// Process Alarms/Errors and possibly put interface to WARNING
+
 				np->addmsg(NS_OK, msg.str());
 			}
 		}
@@ -1353,6 +1359,8 @@ int main(int argc, char **argv) {
 	smi.addsmimap("hpicfXcvrTxPower", "1.3.6.1.4.1.11.2.14.11.5.1.82.1.1.1.1.14");
 	smi.addsmimap("hpicfXcvrTemp", "1.3.6.1.4.1.11.2.14.11.5.1.82.1.1.1.1.11");
 	smi.addsmimap("hpicfXcvrVoltage", "1.3.6.1.4.1.11.2.14.11.5.1.82.1.1.1.1.12");
+	smi.addsmimap("hpicfXcvrAlarms", ".1.3.6.1.4.1.11.2.14.11.5.1.82.1.1.1.1.16");
+	smi.addsmimap("hpicfXcvrErrors", ".1.3.6.1.4.1.11.2.14.11.5.1.82.1.1.1.1.17");
 
 	// HP-ICF-TRANSCEIVER-MIB::hpicfXcvrRcvPwrLoWarn.1
 	// HP-ICF-TRANSCEIVER-MIB::hpicfXcvrRcvPwrHiWarn.103
