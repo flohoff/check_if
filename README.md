@@ -80,3 +80,47 @@ Building snmp++
     make install
 
 
+
+Todo
+====
+
+Transceiver Status Dell DNOS
+----------------------------
+
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortIndex.49 = Gauge32: 49
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortIndex.50 = Gauge32: 50
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsTemperature.49 = INTEGER: 18.5 DEGREES
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsTemperature.50 = INTEGER: 18.2 DEGREES
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsVoltage.49 = INTEGER: 3.246 Volts
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsVoltage.50 = INTEGER: 3.241 Volts
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsCurrent.49 = INTEGER: 5.7 Milliamps
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsCurrent.50 = INTEGER: 5.6 Milliamps
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsPowerOut.49 = INTEGER: -2.994 dBm
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsPowerOut.50 = INTEGER: -3.035 dBm
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsPowerIn.49 = INTEGER: -40.000 dBm
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsPowerIn.50 = INTEGER: -40.000 dBm
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsTxFault.49 = INTEGER: false(2)
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsTxFault.50 = INTEGER: false(2)
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsLos.49 = INTEGER: true(1)
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsLos.50 = INTEGER: true(1)
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsFaultStatus.49 = STRING: "Local Fault"
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsFaultStatus.50 = STRING: "Local Fault"
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsInfoPortIndex.49 = Gauge32: 49
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsInfoPortIndex.50 = Gauge32: 50
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsInfoVendorName.49 = STRING: "FLEXOPTIX       "
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsInfoVendorName.50 = STRING: "FLEXOPTIX       "
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsInfoLinkLength50um.49 = Gauge32: 8
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsInfoLinkLength50um.50 = Gauge32: 8
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsInfoLinkLength62dot5um.49 = Gauge32: 3
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsInfoLinkLength62dot5um.50 = Gauge32: 3
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsInfoSerialNumber.49 = STRING: "FOO1JV1         "
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsInfoSerialNumber.50 = STRING: "FOO1JV2         "
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsInfoPartNumber.49 = STRING: "P.8596.02       "
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsInfoPartNumber.50 = STRING: "P.8596.02       "
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsInfoNominalBitRate.49 = Gauge32: 10300
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsInfoNominalBitRate.50 = Gauge32: 10300
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsInfoRevision.49 = STRING: "1.0 "
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsInfoRevision.50 = STRING: "1.0 "
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsInfoCompliance.49 = STRING: "10GBase-SR"
+	DNOS-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsInfoCompliance.50 = STRING: "10GBase-SR"
+
