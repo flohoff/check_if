@@ -18,14 +18,15 @@ find_package(Boost 1.55.0 REQUIRED COMPONENTS program_options filesystem system)
 include_directories(${Boost_INCLUDE_DIRS})
 
 find_package(Protobuf REQUIRED)
-include_directories(${PROTOBUF_INCLUDE_DIRS})
 PROTOBUF_GENERATE_CPP(PROTO_SRCS PROTO_HDRS IfState.proto)
 
-set(SNMPXX_USE_STATIC_LIBS ON)
-find_package(SnmpXX REQUIRED)
-include_directories(${SNMPXX_INCLUDE_DIR})
+find_package(PkgConfig)
+pkg_check_modules(SNMPXX REQUIRED snmp++-3)
 
 add_executable(checkif checkif.cpp ${PROTO_SRCS} ${PROTO_HDRS})
+
+# Needed for protobuf generated files
+target_include_directories(checkif PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(checkif ${Boost_LIBRARIES})
 target_link_libraries(checkif ${SNMPXX_LIBRARIES})

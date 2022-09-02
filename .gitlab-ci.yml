@@ -1,0 +1,16 @@
+
+build:
+  stage: build
+  variables:
+    DEBIAN_FRONTEND: "noninteractive"
+    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_BASE: https://gitlab-ci-token:${CI_JOB_TOKEN}@gl.zz.de
+  script:
+    - apt-get update && apt-get -fuy install git
+    - apt-get install -fuy build-essential cmake cmake-data libboost-all-dev protobuf-compiler libprotobuf-dev curl pkg-config libssl-dev
+    - curl -o snmp++-3.4.10.tar.gz https://www.agentpp.com/download/snmp++-3.4.10.tar.gz
+    - tar -xvf snmp++-3.4.10.tar.gz
+    - ( cd snmp++-3.4.10 ; ./configure ; make ; make install )
+    - mkdir build
+    - ( cd build ; cmake .. )
+    - make -C build
