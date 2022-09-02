@@ -1,6 +1,7 @@
 *.bin
 .*
 !.gitignore
+!.gitlab-ci.yml
 CMakeCache.txt
 CMakeFiles
 IfState.pb.cc
