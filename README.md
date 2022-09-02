@@ -26,8 +26,8 @@ If the interface supports IPv6 Routing for example the Cisco 9001 the ipv6IfAdmi
 situations where ipv6 will be operational down although the interface is ipv6 configured e.g. after a DAD Event (Duplicate address detection).
 
 
-Tranceiver Monitoring
-=====================
+Transceiver Monitoring
+======================
 
 *check_if* will also monitor Transceiver healthiness and optical levels if available.
 
