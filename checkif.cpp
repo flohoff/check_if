@@ -146,21 +146,6 @@ class CheckIf {
 			return instance;
 		}
 
-		bool has_snmp_variable(const char *eoidstring, int instance) {
-			std::string	oidstring=eoidstring;
-			std::string	value;
-
-			oidstring.append(".");
-			oidstring.append(std::to_string(instance));
-
-			value=snmp->snmpget_printable(oidstring);
-
-			if (value.size() == 0)
-				return false;
-
-			return true;
-		}
-
 		Transceiver *entity_transceiver_check(void ) {
 			unsigned int			instance;
 			std::string			oid;
@@ -262,16 +247,17 @@ class CheckIf {
 			if (instance)
 				ifcap->set_instance(instance);
 
-			ifcap->set_cap_errors(has_snmp_variable("ifInErrors", instance));
-			ifcap->set_cap_hc_counter(has_snmp_variable("ifHCInUcastPkts", instance));
-			ifcap->set_cap_lc_counter(has_snmp_variable("ifInUcastPkts", instance));
-			ifcap->set_cap_ipv6_status(has_snmp_variable("ipv6IfAdminStatus", instance));
-			ifcap->set_cap_hc_mcast(has_snmp_variable("ifHCInMulticastPkts", instance));
-			ifcap->set_cap_cisco_errdisable(has_snmp_variable("cErrDisableRecoveryInterval", 0));
-			ifcap->set_cap_dot3stats(has_snmp_variable("dot3StatsDuplexStatus", instance));
+			ifcap->set_cap_errors(snmp->has_snmp_variable_instance("ifInErrors", instance));
+			ifcap->set_cap_hc_counter(snmp->has_snmp_variable_instance("ifHCInUcastPkts", instance));
+			ifcap->set_cap_lc_counter(snmp->has_snmp_variable_instance("ifInUcastPkts", instance));
+			ifcap->set_cap_ipv6_status(snmp->has_snmp_variable_instance("ipv6IfAdminStatus", instance));
+			ifcap->set_cap_hc_mcast(snmp->has_snmp_variable_instance("ifHCInMulticastPkts", instance));
+			ifcap->set_cap_cisco_errdisable(snmp->has_snmp_variable_instance("cErrDisableRecoveryInterval", 0));
+			ifcap->set_cap_dot3stats(snmp->has_snmp_variable_instance("dot3StatsDuplexStatus", instance));
+
 
 			// Need to check whether Transceiver has DOM capabilities
-			ifcap->set_cap_hpicf_transceiver(has_snmp_variable("hpicfXcvrRxPower", instance));
+			ifcap->set_cap_hpicf_transceiver(snmp->has_snmp_variable_instance("hpicfXcvrRxPower", instance));
 
 			/* FIXME Leaks tranceiver object */
 			Transceiver *tr=entity_transceiver_check();
