@@ -133,6 +133,21 @@ public:
 
 		return result;
 	}
+
+	bool has_snmp_variable_instance(const char *eoidstring, int instance) {
+		std::string	oidstring=eoidstring;
+		std::string	value;
+
+		oidstring.append(".");
+		oidstring.append(std::to_string(instance));
+
+		value=snmpget_printable(oidstring);
+
+		if (value.size() == 0)
+			return false;
+
+		return true;
+	}
 };
 
 #endif
