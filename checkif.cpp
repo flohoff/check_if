@@ -370,9 +370,9 @@ class CheckIf {
 			/* cErrDisableIfStatusCause needs <ifindex>.0 appended */
 			if (ifcap->cap_cisco_errdisable()) {
 				std::string	oid="cErrDisableIfStatusCause";
-				oid.append(".");
-				oid.append(std::to_string(ifcap->instance()));
-				oid.append(".0");
+				oid.append(".")
+					.append(std::to_string(ifcap->instance()))
+					.append(".0");
 				oidstrings.push_back(oid);
 			}
 
@@ -615,25 +615,30 @@ class CheckIf {
 		 * 0.1%
 		 * 2s
 		 */
-		uint64_t delta_max(const std::string &thresh, uint64_t delta_t, uint64_t deltapkts) {
+		uint64_t delta_max(const std::string &threshall, uint64_t delta_t, uint64_t deltapkts) {
+			std::vector<std::string>	tlist;
+			uint64_t			maxfault=0;
 
-			if (thresh.back() == '%') {
-				std::string num=thresh.substr(0,thresh.size()-1);
-				double perc=std::stod(num)/100;
-				return (double) deltapkts*perc;
+			boost::split(tlist, threshall, boost::is_any_of(","));
+
+			for(auto &thresh : tlist ) {
+				if (thresh.back() == '%') {
+					std::string num=thresh.substr(0,thresh.size()-1);
+					double perc=std::stod(num)/100;
+					uint64_t percdelta=(double) deltapkts*perc;
+					maxfault=(maxfault < percdelta) ? percdelta : maxfault;
+				}
+
+				if (thresh.back() == 's') {
+					std::string num=thresh.substr(0,thresh.size()-1);
+					double hertz=std::stod(num);
+					uint64_t hertzdelta=(double) hertz*delta_t;
+					maxfault=(maxfault < hertzdelta) ? hertzdelta : maxfault;
+				}
 			}
 
-			if (thresh.back() == 's') {
-				std::string num=thresh.substr(0,thresh.size()-1);
-				double hertz=std::stod(num);
-				return (double) hertz*delta_t;
-			}
-
-			/*
-			 * FIXME - Returning deltapkts on unparsable threshhold string
-			 * will produce no errors/alarms - we should probably throw an error or something
-			 */
-			return deltapkts;
+			/* Return what we have or max */
+			return maxfault ? maxfault : deltapkts;
 		}
 
 		time_t time_delta(void ) {
@@ -882,10 +887,10 @@ int main(int argc, char **argv) {
 		("ifname", po::value<std::string>(), "interface name to monitor")
 		("cachedir", po::value<std::string>(), "cache directory for state files")
 		("nolinkstatus", po::bool_switch()->default_value(false), "ifOperStatus down is not critical")
-		("ifindiscardsignore", po::value<std::string>()->default_value("0.1%"), "ifInDiscards ignore values")
-		("ifoutdiscardsignore", po::value<std::string>()->default_value("0.1%"), "ifOutDiscards ignore values")
-		("ifinerrorsignore", po::value<std::string>()->default_value("0.1%"), "ifInErrors ignore values")
-		("ifouterrorsignore", po::value<std::string>()->default_value("0.1%"), "ifOutErrors ignore values")
+		("ifindiscardsignore", po::value<std::string>()->default_value("0.1%,1s"), "ifInDiscards ignore values")
+		("ifoutdiscardsignore", po::value<std::string>()->default_value("0.1%,1s"), "ifOutDiscards ignore values")
+		("ifinerrorsignore", po::value<std::string>()->default_value("0.1%,1s"), "ifInErrors ignore values")
+		("ifouterrorsignore", po::value<std::string>()->default_value("0.1%,1s"), "ifOutErrors ignore values")
 	;
 	po::variables_map vm;
 	po::store(po::parse_command_line(argc, argv, desc), vm);
