@@ -84,6 +84,12 @@ Building snmp++
 Todo
 ====
 
+Mac address count
+-----------------
+
+We might want to check for mac address count on L3 enabled devices e.g.
+VLAN interfaces or routed interfaces.
+
 Link member status
 ------------------
 
