@@ -84,6 +84,13 @@ Building snmp++
 Todo
 ====
 
+Link member status
+------------------
+
+In case we monitor a LAG/LACP/Etherchannel we might want to check if
+links = active links and if negotiation worked. Whatever switches might
+expose by SNMP.
+
 Transceiver Status Dell DNOS
 ----------------------------
 
