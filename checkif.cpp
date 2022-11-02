@@ -544,17 +544,28 @@ class CheckIf {
 		}
 
 		uint64_t delta_wrap_correct(uint64_t current, uint64_t last, bool sixtyfour, const std::string &what) {
+			std::ostringstream	msg;
+			bool			reboot=false;
+
 			/* Did it wrap */
 			if (last <= current)
 				return current-last;
 
 			uint64_t result=current+(sixtyfour ? UINT64_MAX : UINT32_MAX)-last;
 
-			std::ostringstream	msg;
+			/* Most likely the switch rebooted - so we assume we started at 0 */
+			if (result > last) {
+				result=current;
+				reboot=true;
+			}
 
-			msg << address << " " << ifname << " " << what << " delta_wrap_correct - current: " << current
+			msg << address << " "
+				<< ifname << " "
+				<< what << " delta_wrap_correct - current: " << current
 				<< " last: " << last << " 64bit " << sixtyfour
-				<< " result: " << result << std::endl;
+				<< " result: " << result 
+				<< (reboot ? "assuming a reboot" : "" )
+				<< std::endl;
 
 			syslog(LOG_INFO, "%s", msg.str().c_str());
 
