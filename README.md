@@ -84,6 +84,11 @@ Building snmp++
 Todo
 ====
 
+Reboot detection
+----------------
+Detect reboot by trying to get sysUptime and monitor for wrap/decrease. If so remove
+file and restart discovery. If counter wrap is to unreliable.
+
 Mac address count
 -----------------
 
